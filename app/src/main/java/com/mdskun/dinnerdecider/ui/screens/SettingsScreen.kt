@@ -1,5 +1,6 @@
 package com.mdskun.dinnerdecider.ui.screens
 
+import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +27,29 @@ fun SettingsScreen(
     viewModel: DinnerViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
+    // Parse current time
+    val timeParts = remember(viewModel.notifTime) {
+        viewModel.notifTime.split(":").let {
+            Pair(it[0].toInt(), it[1].toInt())
+        }
+    }
+
+    // Time picker dialog
+    val timePickerDialog = remember {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
+                viewModel.updateNotifTime(formattedTime)
+            },
+            timeParts.first,
+            timeParts.second,
+            true // 24-hour format
+        )
+    }
+
     Column(
         modifier = modifier.background(WarmBackground)
     ) {
@@ -91,7 +116,9 @@ fun SettingsScreen(
                                 if (viewModel.notifEnabled) AccentColor
                                 else CardBorder
                             )
-                            .clickable { viewModel.toggleNotification(!viewModel.notifEnabled) }
+                            .clickable {
+                                viewModel.toggleNotification(!viewModel.notifEnabled)
+                            }
                     ) {
                         Box(
                             modifier = Modifier
@@ -122,6 +149,11 @@ fun SettingsScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable(enabled = viewModel.notifEnabled) {
+                            if (viewModel.notifEnabled) {
+                                timePickerDialog.show()
+                            }
+                        }
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -134,14 +166,14 @@ fun SettingsScreen(
                             color = DarkText
                         )
                         Text(
-                            text = "Pick what time to send the suggestion",
+                            text = "Tap to change time",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.W600,
                             color = SubtitleText
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
-                    // Time display
+                    // Time display - now clickable
                     Text(
                         text = viewModel.notifTime,
                         fontSize = 15.sp,
@@ -150,7 +182,11 @@ fun SettingsScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                             .background(WarmBackground)
-                            .border(2.dp, CardBorder, RoundedCornerShape(10.dp))
+                            .border(
+                                2.dp,
+                                if (viewModel.notifEnabled) AccentColor.copy(alpha = 0.3f) else CardBorder,
+                                RoundedCornerShape(10.dp)
+                            )
                             .padding(horizontal = 10.dp, vertical = 6.dp)
                     )
                 }

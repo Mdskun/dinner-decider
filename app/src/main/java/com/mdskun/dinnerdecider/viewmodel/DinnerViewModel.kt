@@ -1,6 +1,7 @@
 package com.mdskun.dinnerdecider.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +10,7 @@ import com.mdskun.dinnerdecider.notification.NotificationHelper
 
 class DinnerViewModel(application: Application) : AndroidViewModel(application) {
     private val notificationHelper = NotificationHelper(application)
+    private val prefs = application.getSharedPreferences("dinner_settings", Context.MODE_PRIVATE)
 
     private val defaultList = listOf(
         "Dal Tadka & Roti",
@@ -23,14 +25,14 @@ class DinnerViewModel(application: Application) : AndroidViewModel(application) 
         "Chole Bhature"
     )
 
-    // State variables - these generate their own setters
-    var dinners by mutableStateOf(defaultList.toMutableList())
+    // Load saved data or use defaults
+    var dinners by mutableStateOf(loadDinners())
         private set
 
-    var notifTime by mutableStateOf("17:00")
+    var notifTime by mutableStateOf(loadNotifTime())
         private set
 
-    var notifEnabled by mutableStateOf(true)
+    var notifEnabled by mutableStateOf(loadNotifEnabled())
         private set
 
     var selectedScreen by mutableStateOf("home")
@@ -46,6 +48,7 @@ class DinnerViewModel(application: Application) : AndroidViewModel(application) 
         private set
 
     init {
+        // Schedule notification with saved settings
         scheduleNotification()
     }
 
@@ -62,32 +65,33 @@ class DinnerViewModel(application: Application) : AndroidViewModel(application) 
     fun addDinner(name: String) {
         if (name.isNotBlank()) {
             dinners = dinners.toMutableList().apply { add(name.trim()) }
-            updateSavedDinners()
+            saveAllData()
         }
     }
 
     fun updateDinner(index: Int, newName: String) {
         if (newName.isNotBlank() && index in dinners.indices) {
             dinners = dinners.toMutableList().apply { this[index] = newName.trim() }
-            updateSavedDinners()
+            saveAllData()
         }
     }
 
     fun deleteDinner(index: Int) {
         if (index in dinners.indices) {
             dinners = dinners.toMutableList().apply { removeAt(index) }
-            updateSavedDinners()
+            saveAllData()
         }
     }
 
-    // Renamed to avoid conflict with auto-generated setters
     fun toggleNotification(enabled: Boolean) {
         notifEnabled = enabled
+        saveAllData()
         scheduleNotification()
     }
 
     fun updateNotifTime(time: String) {
         notifTime = time
+        saveAllData()
         scheduleNotification()
     }
 
@@ -109,10 +113,37 @@ class DinnerViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun scheduleNotification() {
         notificationHelper.scheduleNotification(notifTime, notifEnabled)
-        updateSavedDinners()
+        // Save dinners to notification helper for random selection
+        notificationHelper.saveDinners(dinners)
     }
 
-    private fun updateSavedDinners() {
-        notificationHelper.saveDinners(dinners)
+    private fun saveAllData() {
+        prefs.edit().apply {
+            putString("notif_time", notifTime)
+            putBoolean("notif_enabled", notifEnabled)
+            // Save dinners as a set
+            putStringSet("dinners", dinners.toSet())
+            apply() // Use apply() for async saving
+        }
+
+        // Also update notification schedule
+        scheduleNotification()
+    }
+
+    private fun loadDinners(): MutableList<String> {
+        val savedDinners = prefs.getStringSet("dinners", null)
+        return if (savedDinners != null && savedDinners.isNotEmpty()) {
+            savedDinners.toMutableList()
+        } else {
+            defaultList.toMutableList()
+        }
+    }
+
+    private fun loadNotifTime(): String {
+        return prefs.getString("notif_time", "17:00") ?: "17:00"
+    }
+
+    private fun loadNotifEnabled(): Boolean {
+        return prefs.getBoolean("notif_enabled", true)
     }
 }

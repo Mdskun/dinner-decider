@@ -16,6 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
@@ -37,19 +39,24 @@ fun ListScreen(
     var editValue by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
-    Column(modifier = modifier.background(WarmBackground)) {
+    Column(
+        modifier = modifier.background(WarmBackground)
+    ) {
+        // Top Bar
         TopBar(
             title = "Dinner List",
             subtitle = "${viewModel.dinners.size} meals",
             onBack = { viewModel.goBack() }
         )
 
+        // Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 20.dp)
                 .padding(top = 16.dp)
         ) {
+            // Add new item
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,31 +78,37 @@ fun ListScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            viewModel.addDinner(newItem)
-                            newItem = ""
-                            focusManager.clearFocus()
+                            if (newItem.isNotBlank()) {
+                                viewModel.addDinner(newItem)
+                                newItem = ""
+                                focusManager.clearFocus()
+                            }
                         }
                     ),
                     cursorBrush = SolidColor(AccentColor),
                     decorationBox = { innerTextField ->
-                        if (newItem.isEmpty()) {
-                            Text(
-                                "Add a new dinner…",
-                                style = TextStyle(
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.W600,
-                                    color = LightSubtitle
+                        Box {
+                            if (newItem.isEmpty()) {
+                                Text(
+                                    "Add a new dinner…",
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.W600,
+                                        color = LightSubtitle
+                                    )
                                 )
-                            )
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
                     }
                 )
 
                 Button(
                     onClick = {
-                        viewModel.addDinner(newItem)
-                        newItem = ""
+                        if (newItem.isNotBlank()) {
+                            viewModel.addDinner(newItem)
+                            newItem = ""
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AccentColor,
@@ -104,40 +117,63 @@ fun ListScreen(
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                 ) {
-                    Text("Add", fontSize = 14.sp, fontWeight = FontWeight.W800)
+                    Text(
+                        "Add",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W800
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // List
             if (viewModel.dinners.isEmpty()) {
-                Text(
-                    text = "No dinners yet. Add some above! 🍽️",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.W600,
-                    color = LightSubtitle,
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 32.dp)
-                )
+                        .padding(vertical = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No dinners yet. Add some above! 🍽️",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W600,
+                        color = LightSubtitle
+                    )
+                }
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     itemsIndexed(viewModel.dinners) { index, dinner ->
-                        DinnerItem(
+                        EditableDinnerItem(
                             dinner = dinner,
                             color = WheelColors[index % WheelColors.size],
                             isEditing = editingIndex == index,
-                            editValue = editValue,
-                            onEditValueChange = { editValue = it },
+                            editValue = if (editingIndex == index) editValue else dinner,
                             onStartEdit = {
                                 editingIndex = index
                                 editValue = dinner
                             },
+                            onEditValueChange = { editValue = it },
                             onSaveEdit = {
-                                viewModel.updateDinner(index, editValue)
+                                if (editValue.isNotBlank() && editValue != dinner) {
+                                    viewModel.updateDinner(index, editValue)
+                                }
                                 editingIndex = -1
+                                focusManager.clearFocus()
                             },
-                            onDelete = { viewModel.deleteDinner(index) }
+                            onCancelEdit = {
+                                editingIndex = -1
+                                focusManager.clearFocus()
+                            },
+                            onDelete = {
+                                viewModel.deleteDinner(index)
+                                if (editingIndex == index) {
+                                    editingIndex = -1
+                                }
+                            }
                         )
                     }
                 }
@@ -147,17 +183,25 @@ fun ListScreen(
 }
 
 @Composable
-fun DinnerItem(
+fun EditableDinnerItem(
     dinner: String,
     color: androidx.compose.ui.graphics.Color,
     isEditing: Boolean,
     editValue: String,
-    onEditValueChange: (String) -> Unit,
     onStartEdit: () -> Unit,
+    onEditValueChange: (String) -> Unit,
     onSaveEdit: () -> Unit,
+    onCancelEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
+    // Request focus when editing starts
+    LaunchedEffect(isEditing) {
+        if (isEditing) {
+            focusRequester.requestFocus()
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -168,6 +212,7 @@ fun DinnerItem(
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Color dot
         Box(
             modifier = Modifier
                 .size(8.dp)
@@ -177,15 +222,14 @@ fun DinnerItem(
 
         Spacer(modifier = Modifier.width(10.dp))
 
+        // Text or Edit field
         if (isEditing) {
             BasicTextField(
                 value = editValue,
                 onValueChange = onEditValueChange,
                 modifier = Modifier
                     .weight(1f)
-                    .onFocusChanged { focusState ->
-                        if (!focusState.isFocused) onSaveEdit()
-                    },
+                    .focusRequester(focusRequester),
                 textStyle = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.W600,
@@ -194,21 +238,27 @@ fun DinnerItem(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
-                    onDone = {
-                        onSaveEdit()
-                        focusManager.clearFocus()
-                    }
+                    onDone = { onSaveEdit() }
                 ),
-                cursorBrush = SolidColor(AccentColor),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier
-                            .border(2.dp, AccentColor, RoundedCornerShape(4.dp))
-                            .padding(2.dp)
-                    ) {
-                        innerTextField()
-                    }
-                }
+                cursorBrush = SolidColor(AccentColor)
+            )
+
+            // Save button when editing
+            Text(
+                text = "✅",
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .clickable(onClick = onSaveEdit)
+                    .padding(4.dp)
+            )
+
+            // Cancel button when editing
+            Text(
+                text = "❌",
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .clickable(onClick = onCancelEdit)
+                    .padding(4.dp)
             )
         } else {
             Text(
@@ -218,24 +268,26 @@ fun DinnerItem(
                 color = DarkText,
                 modifier = Modifier.weight(1f)
             )
+
+            // Edit button
+            Text(
+                text = "✏️",
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .clickable(onClick = onStartEdit)
+                    .padding(4.dp)
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            // Delete button
+            Text(
+                text = "🗑️",
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .clickable(onClick = onDelete)
+                    .padding(4.dp)
+            )
         }
-
-        Text(
-            text = "✏️",
-            fontSize = 16.sp,
-            modifier = Modifier
-                .clickable(onClick = onStartEdit)
-                .padding(4.dp)
-        )
-
-        Spacer(modifier = Modifier.width(4.dp))
-
-        Text(
-            text = "🗑️",
-            fontSize = 16.sp,
-            modifier = Modifier
-                .clickable(onClick = onDelete)
-                .padding(4.dp)
-        )
     }
 }
