@@ -85,11 +85,13 @@ If you like this app, please:
 
 ## 📝 Changelog
 
-### v1.0.0
+### v1.0.1
 - Initial release
 - Dinner list management
 - Spin wheel with animations
+- Daily notifications
 - Material 3 design
+- Status bar colour fix
 
 ---
 
