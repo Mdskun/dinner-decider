@@ -14,7 +14,7 @@ A beautiful Android app that helps you decide what's for dinner! Never wonder "w
 
 | Home | Dinner List | Spin Wheel | Settings |
 |------|-------------|------------|----------|
-| ![Home](screenshots/home.png) | ![List](screenshots/list.png) | ![Spin](screenshots/spin.png) | ![Settings](screenshots/settings.png) |
+| ![Home](./screenshots/home.jpg) | ![List](./screenshots/list.jpg) | ![Spin](./screenshots/spin.jpg) | ![Settings](./screenshots/settings.jpg) |
 
 ## 🚀 Download
 
@@ -36,17 +36,17 @@ Get the latest APK from the [Releases](https://github.com/mdskun/dinner-decider/
 
 1. Clone the repository
 
-    ```bash
+```bash
     git clone https://github.com/Mdskun/dinner-decider.git
-    ```
+```
 
 2. Open in Android Studio (Hedgehog or later)
 
 3. Build and run:
 
-    ```bash
+```bash
     ./gradlew assembleDebug
-    ```
+```
 
 ## 🎯 How to Use
 
@@ -92,6 +92,7 @@ If you like this app, please:
 - Daily notifications
 - Material 3 design
 - Status bar colour fix
+- icon added
 
 ---
 
