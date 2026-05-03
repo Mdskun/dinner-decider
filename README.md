@@ -1,99 +1,152 @@
 # 🍽️ Dinner Decider
 
-A beautiful Android app that helps you decide what's for dinner! Never wonder "what should we eat tonight?" again.
+<p align="center">
+  <b>Never ask “What’s for dinner?” again.</b><br/>
+  A simple, fun, and beautiful Android app to help you decide your next meal.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/mdskun/dinner-decider?style=for-the-badge" />
+  <img src="https://img.shields.io/github/downloads/mdskun/dinner-decider/total?style=for-the-badge" />
+  <img src="https://img.shields.io/github/stars/mdskun/dinner-decider?style=for-the-badge" />
+  <img src="https://img.shields.io/github/license/mdskun/dinner-decider?style=for-the-badge" />
+</p>
+
+---
 
 ## ✨ Features
 
-- 📋 **Dinner List** - Add, edit, and manage your favorite meals
-- 🎡 **Spin Wheel** - Fun spinning wheel to randomly pick dinner
-- 🔔 **Daily Notifications** - Get a dinner suggestion every day at your preferred time
-- 🎨 **Beautiful Design** - Modern Material 3 design with warm colors
-- 💾 **Persistent Storage** - Your dinner list and settings are saved automatically
+* 📋 **Smart Dinner List**
+  Add, edit, and organize your favorite meals
+
+* 🎡 **Spin Wheel Picker**
+  Randomly choose dinner in a fun, interactive way
+
+* 🔔 **Daily Notifications**
+  Get automatic dinner suggestions at your chosen time
+
+* 🎨 **Modern UI**
+  Built with Material 3 for a clean and warm experience
+
+* 💾 **Auto Save**
+  Your data persists seamlessly
+
+---
 
 ## 📱 Screenshots
 
-| Home | Dinner List | Spin Wheel | Settings |
-|------|-------------|------------|----------|
-| ![Home](./screenshots/home.jpg) | ![List](./screenshots/list.jpg) | ![Spin](./screenshots/spin.jpg) | ![Settings](./screenshots/settings.jpg) |
+<p align="center">
+  <img src="./screenshots/home.jpg" width="22%" />
+  <img src="./screenshots/list.jpg" width="22%" />
+  <img src="./screenshots/spin.jpg" width="22%" />
+  <img src="./screenshots/settings.jpg" width="22%" />
+</p>
+
+---
 
 ## 🚀 Download
 
-Get the latest APK from the [Releases](https://github.com/mdskun/dinner-decider/releases) page.
+<p align="center">
+  <a href="https://github.com/mdskun/dinner-decider/releases">
+    <img src="https://img.shields.io/badge/Download-APK-blue?style=for-the-badge&logo=android" />
+  </a>
+</p>
 
-## 🛠️ Built With
+---
 
-- [Kotlin](https://kotlinlang.org/) - Programming language
-- [Jetpack Compose](https://developer.android.com/jetpack/compose) - Modern UI toolkit
-- [Material 3](https://m3.material.io/) - Design system
-- [AndroidX](https://developer.android.com/jetpack/androidx) - Support libraries
+## 🛠️ Tech Stack
+
+| Technology      | Purpose                   |
+| --------------- | ------------------------- |
+| Kotlin          | Core programming language |
+| Jetpack Compose | UI development            |
+| Material 3      | Design system             |
+| AndroidX        | Core libraries            |
+
+---
 
 ## 📋 Requirements
 
-- Android 8.0 (Oreo) or higher
-- Internet connection (for initial download only)
+* Android 8.0 (Oreo) or higher
+* Internet (only for initial download)
 
-## 🏗️ Building from Source
+---
 
-1. Clone the repository
-
-```bash
-    git clone https://github.com/Mdskun/dinner-decider.git
-```
-
-2. Open in Android Studio (Hedgehog or later)
-
-3. Build and run:
+## 🏗️ Build from Source
 
 ```bash
-    ./gradlew assembleDebug
+git clone https://github.com/Mdskun/dinner-decider.git
+cd dinner-decider
+./gradlew assembleDebug
 ```
 
-## 🎯 How to Use
+> Open the project in **Android Studio Hedgehog or newer**
 
-1. **Add Dinners**: Go to Dinner List and add your favorite meals
-2. **Spin**: Use the Spin Wheel to randomly pick a dinner
-3. **Set Reminder**: Configure daily notification time in Settings
-4. **Enjoy**: Never stress about dinner decisions again!
+---
 
-## 🔔 Notification Setup
+## 🎯 Usage
 
-For best notification experience:
-- Grant notification permission when prompted
-- **Xiaomi/Redmi**: Enable "Autostart" in Settings → Apps → Dinner Decider
-- **Samsung**: Exclude from battery optimization
-- **OnePlus/OPPO**: Lock the app in recent apps
+1. Add your meals in **Dinner List**
+2. Spin the wheel 🎡
+3. Set a daily reminder 🔔
+4. Enjoy stress-free decisions 🍽️
 
-## 🤝 Contributing
+---
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+## 🔔 Notification Tips
+
+To ensure notifications work reliably:
+
+* Allow notification permission ✅
+
+**Device-specific:**
+
+* **Xiaomi / Redmi** → Enable *Autostart*
+* **Samsung** → Disable battery optimization
+* **OnePlus / OPPO** → Lock app in recent apps
+
+---
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the **MIT License**
+See the [LICENSE](LICENSE) file for details.
+
+---
 
 ## 👨‍💻 Author
 
 **Mdskun**
-- GitHub: [@mdskun](https://github.com/mdskun)
+🔗 [https://github.com/mdskun](https://github.com/mdskun)
+
+---
 
 ## 🌟 Support
 
-If you like this app, please:
-- ⭐ Star this repository
-- 🐛 Report bugs in [Issues](https://github.com/mdskun/dinner-decider/issues)
-- 💡 Suggest features in [Discussions](https://github.com/mdskun/dinner-decider/discussions)
+If you like this project:
+
+* ⭐ Star the repo
+* 🐛 Report issues
+* 💡 Suggest features
+
+---
 
 ## 📝 Changelog
 
 ### v1.0.1
-- Initial release
-- Dinner list management
-- Spin wheel with animations
-- Daily notifications
-- Material 3 design
-- Status bar colour fix
-- icon added
+
+* Initial release
+* Dinner list management
+* Spin wheel with animations
+* Daily notifications
+* Material 3 UI
+* Status bar fix
+* App icon added
 
 ---
 
-Made with ❤️ for everyone who's tired of deciding dinner
+## ❤️ Special Note
+
+> Made with ❤️ for everyone tired of deciding dinner.
+> And especially for **Mom** — who’s tired of asking *“What should I cook?”* 🍲
+
