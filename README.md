@@ -1,39 +1,66 @@
+<div align="center">
+
 # 🍽️ Dinner Decider
 
+### *Stop overthinking dinner. Start enjoying it.*
+
 <p align="center">
-  <b>Never ask “What’s for dinner?” again.</b><br/>
-  A simple, fun, and beautiful Android app to help you decide your next meal.
+  A modern Android app that helps you instantly decide what to eat using a fun spin wheel and smart reminders.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/github/v/release/mdskun/dinner-decider?style=for-the-badge" />
-  <img src="https://img.shields.io/github/downloads/mdskun/dinner-decider/total?style=for-the-badge" />
-  <img src="https://img.shields.io/github/stars/mdskun/dinner-decider?style=for-the-badge" />
   <img src="https://img.shields.io/github/license/mdskun/dinner-decider?style=for-the-badge" />
 </p>
+</div>
+---
+
+# 📑 Table of Contents
+
+* [📌 Overview](#-overview)
+* [✨ Features](#-features)
+* [📸 Screenshots](#-screenshots)
+* [⚙️ Configuration](#️-configuration)
+* [🛠️ Tech Stack](#️-tech-stack)
+* [📋 Requirements](#-requirements)
+* [🚀 Installation / Setup](#-installation--setup)
+* [⚡ Working](#-working)
+* [📂 Project Structure](#-project-structure)
+* [📄 Documentation](#-documentation)
+* [🤝 Contribution](#-contribution)
+* [📜 License](#-license)
+* [👨‍💻 Author & Credits](#-author--credits)
 
 ---
 
-## ✨ Features
+# 📌 Overview
 
-* 📋 **Smart Dinner List**
-  Add, edit, and organize your favorite meals
+**Dinner Decider** is a beautifully designed Android app that eliminates the daily struggle of choosing what to eat.
 
-* 🎡 **Spin Wheel Picker**
-  Randomly choose dinner in a fun, interactive way
-
-* 🔔 **Daily Notifications**
-  Get automatic dinner suggestions at your chosen time
-
-* 🎨 **Modern UI**
-  Built with Material 3 for a clean and warm experience
-
-* 💾 **Auto Save**
-  Your data persists seamlessly
+Instead of endless debates, simply spin the wheel 🎡 and let the app decide for you.
 
 ---
 
-## 📱 Screenshots
+# ✨ Features
+
+* 🎡 **Spin Wheel Decision Maker**
+  Instantly pick a random meal in a fun way
+
+* 📋 **Custom Meal List**
+  Add, edit, and manage your favorite dishes
+
+* 🔔 **Smart Notifications**
+  Get daily reminders for meal decisions
+
+* 🎨 **Modern UI (Material 3)**
+  Clean, smooth, and responsive design
+
+* 💾 **Persistent Storage**
+  Your meals are saved automatically
+
+---
+
+# 📸 Screenshots
 
 <p align="center">
   <img src="./screenshots/home.jpg" width="22%" />
@@ -44,7 +71,43 @@
 
 ---
 
-## 🚀 Download
+# ⚙️ Configuration
+
+## 🔔 Notifications Setup
+
+To ensure notifications work correctly:
+
+* Enable notification permissions ✅
+
+### 📱 Device-Specific Settings
+
+| Device Brand   | Required Action              |
+| -------------- | ---------------------------- |
+| Xiaomi / Redmi | Enable *Autostart*           |
+| Samsung        | Disable battery optimization |
+| OnePlus / OPPO | Lock app in recent apps      |
+
+---
+
+# 🛠️ Tech Stack
+
+* **Kotlin** → Core language
+* **Jetpack Compose** → UI framework
+* **Material 3** → Design system
+* **AndroidX** → Core libraries
+
+---
+
+# 📋 Requirements
+
+* Android 8.0 (Oreo) or higher
+* Android Studio Hedgehog or newer
+
+---
+
+# 🚀 Installation / Setup
+
+## 🔽 Download APK
 
 <p align="center">
   <a href="https://github.com/mdskun/dinner-decider/releases">
@@ -54,25 +117,7 @@
 
 ---
 
-## 🛠️ Tech Stack
-
-| Technology      | Purpose                   |
-| --------------- | ------------------------- |
-| Kotlin          | Core programming language |
-| Jetpack Compose | UI development            |
-| Material 3      | Design system             |
-| AndroidX        | Core libraries            |
-
----
-
-## 📋 Requirements
-
-* Android 8.0 (Oreo) or higher
-* Internet (only for initial download)
-
----
-
-## 🏗️ Build from Source
+## 🧑‍💻 Build from Source
 
 ```bash
 git clone https://github.com/Mdskun/dinner-decider.git
@@ -80,73 +125,93 @@ cd dinner-decider
 ./gradlew assembleDebug
 ```
 
-> Open the project in **Android Studio Hedgehog or newer**
+---
+
+# ⚡ Working
+
+## 🎯 User Flow
+
+1. Add meals in the **Dinner List**
+2. Tap **Spin Wheel** 🎡
+3. Get a random meal suggestion
+4. Receive daily reminders 🔔
 
 ---
 
-## 🎯 Usage
+## 🔍 Internal Logic
 
-1. Add your meals in **Dinner List**
-2. Spin the wheel 🎡
-3. Set a daily reminder 🔔
-4. Enjoy stress-free decisions 🍽️
+* Meals are stored locally using persistent storage
+* Spin wheel uses random selection algorithm
+* Notification manager triggers scheduled alerts
+* UI is fully reactive using Jetpack Compose
 
----
+<!-- ---
 
-## 🔔 Notification Tips
+# 📂 Project Structure
 
-To ensure notifications work reliably:
-
-* Allow notification permission ✅
-
-**Device-specific:**
-
-* **Xiaomi / Redmi** → Enable *Autostart*
-* **Samsung** → Disable battery optimization
-* **OnePlus / OPPO** → Lock app in recent apps
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**
-See the [LICENSE](LICENSE) file for details.
+```
+dinner-decider/
+│
+├── app/
+│   ├── ui/            # Compose UI components
+│   ├── data/          # Local data handling
+│   ├── logic/         # Spin + business logic
+│   └── notifications/ # Reminder system
+│
+├── screenshots/       # App images
+└── README.md
+``` -->
 
 ---
 
-## 👨‍💻 Author
+# 📄 Documentation
 
-**Mdskun**
-🔗 [https://github.com/mdskun](https://github.com/mdskun)
+<!-- ## 🏗️ Architecture
 
----
-
-## 🌟 Support
-
-If you like this project:
-
-* ⭐ Star the repo
-* 🐛 Report issues
-* 💡 Suggest features
-
----
+* MVVM-inspired structure
+* Clear separation of UI, logic, and data
+* Reactive UI using Compose -->
 
 ## 📝 Changelog
 
 ### v1.0.1
 
 * Initial release
-* Dinner list management
-* Spin wheel with animations
-* Daily notifications
+* Spin wheel feature
+* Meal list management
+* Notifications
 * Material 3 UI
-* Status bar fix
-* App icon added
+
+---
+
+# 🤝 Contribution
+
+Contributions are welcome!
+
+* ⭐ Star the repo
+* 🐛 Report issues
+* 💡 Suggest features
+* 🔧 Submit PRs
+
+---
+
+# 📜 License
+
+This project is licensed under the **MIT License**.
+See the `LICENSE` file for details.
+
+---
+
+# 👨‍💻 Author & Credits
+
+**Mdskun**
+🔗 [https://github.com/mdskun](https://github.com/mdskun)
 
 ---
 
 ## ❤️ Special Note
 
-> Made with ❤️ for everyone tired of deciding dinner.
-> And especially for **Mom** — who’s tired of asking *“What should I cook?”* 🍲
+> Built with ❤️ to solve a real everyday problem.
 
+> Dedicated to all moms tired of asking:
+> **“What should I cook today?” 🍲**
