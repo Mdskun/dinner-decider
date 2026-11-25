@@ -25,6 +25,7 @@ import com.mdskun.dinnerdecider.R
 import com.mdskun.dinnerdecider.ui.component.TopBar
 import com.mdskun.dinnerdecider.ui.theme.*
 import com.mdskun.dinnerdecider.viewmodel.DinnerViewModel
+import java.util.Locale
 
 @Composable
 fun SettingsScreen(
@@ -42,7 +43,7 @@ fun SettingsScreen(
         TimePickerDialog(
             context,
             { _, hourOfDay, minute ->
-                val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
+                val formattedTime = String.format(Locale.US, "%02d:%02d", hourOfDay, minute)
                 viewModel.updateNotifTime(formattedTime)
             },
             initialHour,

@@ -14,6 +14,7 @@ import com.mdskun.dinnerdecider.MainActivity
 import com.mdskun.dinnerdecider.R
 import org.json.JSONArray
 import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class NotificationHelper(private val context: Context) {
@@ -126,12 +127,7 @@ class NotificationHelper(private val context: Context) {
             return pick
         }
 
-        fun scheduleNotification(context: Context, time: String, enabled: Boolean) {
-            val workManager = WorkManager.getInstance(context)
-            workManager.cancelUniqueWork(WORK_NAME)
-
-            if (!enabled) return
-
+        fun calculateInitialDelayMs(time: String): Long {
             val parts = time.split(":")
             val hour = parts.getOrNull(0)?.toIntOrNull() ?: 17
             val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
@@ -146,8 +142,18 @@ class NotificationHelper(private val context: Context) {
                     add(Calendar.DAY_OF_YEAR, 1)
                 }
             }
+            return target.timeInMillis - now.timeInMillis
+        }
 
-            val initialDelayMs = target.timeInMillis - now.timeInMillis
+        fun scheduleNotification(context: Context, time: String, enabled: Boolean) {
+            val workManager = WorkManager.getInstance(context)
+
+            if (!enabled) {
+                workManager.cancelUniqueWork(WORK_NAME)
+                return
+            }
+
+            val initialDelayMs = calculateInitialDelayMs(time)
 
             val workRequest = OneTimeWorkRequestBuilder<DinnerNotificationWorker>()
                 .setInitialDelay(initialDelayMs, TimeUnit.MILLISECONDS)
@@ -184,7 +190,7 @@ class NotificationHelper(private val context: Context) {
 
     fun showNotification(dinner: String) {
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pendingIntent = PendingIntent.getActivity(
             context, 0, intent,
@@ -211,7 +217,7 @@ class NotificationHelper(private val context: Context) {
             .setContentIntent(pendingIntent)
             .addAction(
                 R.drawable.ic_notification,
-                context.getString(R.string.notification_action_spin),
+                context.getString(R.string.notification_action_suggest_another),
                 actionPendingIntent
             )
             .setAutoCancel(true)
@@ -243,18 +249,21 @@ class DinnerNotificationWorker(
             val helper = NotificationHelper(appContext)
             helper.showNotification(dinner)
 
-            // Reschedule for next day
-            NotificationHelper.scheduleNotification(appContext, time, true)
+            // Schedule tomorrow's work directly using WorkManager without canceling running work
+            val delayMs = NotificationHelper.calculateInitialDelayMs(time)
+            val nextWorkRequest = OneTimeWorkRequestBuilder<DinnerNotificationWorker>()
+                .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
+                .addTag(NotificationHelper.WORK_TAG)
+                .build()
+
+            WorkManager.getInstance(appContext).enqueueUniqueWork(
+                NotificationHelper.WORK_NAME,
+                ExistingWorkPolicy.REPLACE,
+                nextWorkRequest
+            )
         }
 
         return Result.success()
-    }
-}
-
-class NotificationReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        val dinner = NotificationHelper.pickNextDinner(context)
-        NotificationHelper(context).showNotification(dinner)
     }
 }
 
@@ -263,20 +272,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
         if (intent.action == NotificationHelper.ACTION_SPIN_AGAIN) {
             val dinner = NotificationHelper.pickNextDinner(context)
             NotificationHelper(context).showNotification(dinner)
-        }
-    }
-}
-
-class BootReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            val prefs = NotificationHelper.getPrefs(context)
-            val time = prefs.getString(NotificationHelper.KEY_NOTIF_TIME, "17:00") ?: "17:00"
-            val enabled = prefs.getBoolean(NotificationHelper.KEY_NOTIF_ENABLED, true)
-
-            if (enabled) {
-                NotificationHelper.scheduleNotification(context, time, true)
-            }
         }
     }
 }

@@ -31,6 +31,18 @@ fun SpinScreen(
     val rotationAnim = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
+    // Calculate live active item under pointer for real-time ticker
+    val liveActiveMeal = remember(rotationAnim.value, viewModel.dinners) {
+        val count = viewModel.dinners.size
+        if (count == 0) null
+        else {
+            val sliceAngle = (2f * PI.toFloat() / count)
+            val normalized = (((-rotationAnim.value - PI.toFloat() / 2f) % (2f * PI.toFloat())) + 2f * PI.toFloat()) % (2f * PI.toFloat())
+            val index = ((normalized / sliceAngle).toInt() % count + count) % count
+            viewModel.dinners.getOrNull(index)
+        }
+    }
+
     fun performSpin() {
         val dinners = viewModel.dinners
         if (viewModel.spinning || dinners.isEmpty()) return
@@ -53,21 +65,24 @@ fun SpinScreen(
         val targetRotation = currentVal + extraSpins + deltaMod
 
         scope.launch {
-            viewModel.startSpin()
-            viewModel.displayResult(false)
-            viewModel.setSpinResult(null)
+            try {
+                viewModel.startSpin()
+                viewModel.displayResult(false)
+                viewModel.setSpinResult(null)
 
-            rotationAnim.animateTo(
-                targetValue = targetRotation,
-                animationSpec = tween(
-                    durationMillis = 3500,
-                    easing = CubicBezierEasing(0.15f, 0.85f, 0.25f, 1.0f)
+                rotationAnim.animateTo(
+                    targetValue = targetRotation,
+                    animationSpec = tween(
+                        durationMillis = 3500,
+                        easing = CubicBezierEasing(0.15f, 0.85f, 0.25f, 1.0f)
+                    )
                 )
-            )
 
-            viewModel.setSpinResult(selectedDinner)
-            viewModel.stopSpin()
-            viewModel.displayResult(true)
+                viewModel.setSpinResult(selectedDinner)
+                viewModel.displayResult(true)
+            } finally {
+                viewModel.stopSpin()
+            }
         }
     }
 
@@ -88,7 +103,7 @@ fun SpinScreen(
                 .padding(top = 16.dp, bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top Pointer indicator
+            // Live Pointer Indicator
             Text(
                 text = "▼",
                 fontSize = 28.sp,
@@ -104,7 +119,20 @@ fun SpinScreen(
                 currentAngle = rotationAnim.value
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // Live active meal ticker when spinning
+            if (viewModel.spinning && liveActiveMeal != null) {
+                Text(
+                    text = liveActiveMeal,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.W800,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            } else {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Spin Button
             Button(

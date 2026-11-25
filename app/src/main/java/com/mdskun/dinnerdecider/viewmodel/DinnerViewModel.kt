@@ -1,7 +1,6 @@
 package com.mdskun.dinnerdecider.viewmodel
 
 import android.app.Application
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -56,6 +55,7 @@ class DinnerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun goBack() {
         selectedScreen = "home"
+        spinning = false
         result = null
         showResult = false
         duplicateError = null
@@ -80,14 +80,21 @@ class DinnerViewModel(application: Application) : AndroidViewModel(application) 
         return true
     }
 
-    fun updateDinner(index: Int, newName: String) {
+    fun updateDinner(index: Int, newName: String): Boolean {
         val trimmed = newName.trim()
-        if (trimmed.isNotBlank() && index in dinners.indices) {
-            val mutable = dinners.toMutableList()
-            mutable[index] = trimmed
-            dinners = mutable
-            saveDinnersData()
+        if (trimmed.isBlank() || index !in dinners.indices) return false
+
+        if (dinners.indices.any { i -> i != index && dinners[i].equals(trimmed, ignoreCase = true) }) {
+            duplicateError = getApplication<Application>().getString(R.string.duplicate_error, trimmed)
+            return false
         }
+
+        duplicateError = null
+        val mutable = dinners.toMutableList()
+        mutable[index] = trimmed
+        dinners = mutable
+        saveDinnersData()
+        return true
     }
 
     fun deleteDinner(index: Int) {

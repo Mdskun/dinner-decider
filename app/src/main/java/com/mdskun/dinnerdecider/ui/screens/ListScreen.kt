@@ -2,7 +2,6 @@ package com.mdskun.dinnerdecider.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -32,7 +31,6 @@ import com.mdskun.dinnerdecider.R
 import com.mdskun.dinnerdecider.ui.component.TopBar
 import com.mdskun.dinnerdecider.ui.theme.*
 import com.mdskun.dinnerdecider.viewmodel.DinnerViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun ListScreen(
@@ -46,7 +44,6 @@ fun ListScreen(
 
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     // Handle delete snackbar with Undo action
     val lastDeleted = viewModel.lastDeletedItem
@@ -55,17 +52,15 @@ fun ListScreen(
 
     LaunchedEffect(lastDeleted) {
         if (lastDeleted != null) {
-            scope.launch {
-                val result = snackbarHostState.showSnackbar(
-                    message = deletedMessage,
-                    actionLabel = undoLabel,
-                    duration = SnackbarDuration.Short
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.undoDelete()
-                } else {
-                    viewModel.clearLastDeletedItem()
-                }
+            val result = snackbarHostState.showSnackbar(
+                message = deletedMessage,
+                actionLabel = undoLabel,
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.undoDelete()
+            } else {
+                viewModel.clearLastDeletedItem()
             }
         }
     }
@@ -214,18 +209,33 @@ fun ListScreen(
                                 onStartEdit = {
                                     editingIndex = index
                                     editValue = dinner
+                                    if (viewModel.duplicateError != null) {
+                                        viewModel.clearDuplicateError()
+                                    }
                                 },
-                                onEditValueChange = { editValue = it },
+                                onEditValueChange = {
+                                    editValue = it
+                                    if (viewModel.duplicateError != null) {
+                                        viewModel.clearDuplicateError()
+                                    }
+                                },
                                 onSaveEdit = {
                                     if (editValue.isNotBlank() && editValue != dinner) {
-                                        viewModel.updateDinner(index, editValue)
+                                        if (viewModel.updateDinner(index, editValue)) {
+                                            editingIndex = -1
+                                            focusManager.clearFocus()
+                                        }
+                                    } else {
+                                        editingIndex = -1
+                                        focusManager.clearFocus()
                                     }
-                                    editingIndex = -1
-                                    focusManager.clearFocus()
                                 },
                                 onCancelEdit = {
                                     editingIndex = -1
                                     focusManager.clearFocus()
+                                    if (viewModel.duplicateError != null) {
+                                        viewModel.clearDuplicateError()
+                                    }
                                 },
                                 onDelete = {
                                     viewModel.deleteDinner(index)

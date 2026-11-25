@@ -51,6 +51,7 @@
     <string name="notification_title">🍽️ Dinner Decider</string>
     <string name="notification_text">Tonight\'s dinner suggestion: %1$s</string>
     <string name="notification_big_text">Tonight\'s dinner suggestion:\n\n%1$s\n\nTap to open the app and see more options!</string>
-    <string name="notification_action_spin">🎲 Spin again</string>
+    <string name="notification_action_spin">🎲 Suggest another</string>
+    <string name="notification_action_suggest_another">🎲 Suggest another</string>
     <string name="notification_permission_required">Please enable notification permission in Settings to receive daily suggestions.</string>
 </resources>

@@ -4,13 +4,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
@@ -22,10 +23,21 @@ import com.mdskun.dinnerdecider.viewmodel.DinnerViewModel
 
 class MainActivity : ComponentActivity() {
 
-    val requestPermissionLauncher = registerForActivityResult(
+    private var activeViewModel: DinnerViewModel? = null
+
+    private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
-        // Handle notification permission result
+        if (!isGranted) {
+            activeViewModel?.toggleNotification(false)
+            Toast.makeText(
+                this,
+                getString(R.string.notification_permission_required),
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            activeViewModel?.toggleNotification(true)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,18 +56,20 @@ class MainActivity : ComponentActivity() {
 
             DinnerDeciderTheme(darkTheme = darkTheme) {
                 val viewModel: DinnerViewModel = viewModel()
+                activeViewModel = viewModel
+
                 DinnerApp(
                     viewModel = viewModel,
                     onRequestNotificationPermission = { requestNotificationPermission() },
                     modifier = Modifier
                         .fillMaxSize()
-                        .statusBarsPadding()
+                        .systemBarsPadding() // Padding for both status bar and navigation bar
                 )
             }
         }
     }
 
-    fun requestNotificationPermission() {
+    private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,

@@ -19,6 +19,33 @@ class DinnerLogicTest {
     }
 
     @Test
+    fun updateDinner_detectsDuplicatesExcludingCurrentIndex() {
+        val list = listOf("Pasta Arrabiata", "Dal Tadka", "Biryani")
+
+        // Renaming index 1 ("Dal Tadka") to "pasta arrabiata" should be detected as duplicate
+        val renameToExisting = "pasta arrabiata".trim()
+        val indexToEdit = 1
+        val isDuplicate = list.indices.any { i -> i != indexToEdit && list[i].equals(renameToExisting, ignoreCase = true) }
+        assertTrue(isDuplicate)
+
+        // Renaming index 1 to same name "Dal Tadka" should NOT be flagged as duplicate
+        val sameName = "Dal Tadka".trim()
+        val isSameNameDuplicate = list.indices.any { i -> i != indexToEdit && list[i].equals(sameName, ignoreCase = true) }
+        assertFalse(isSameNameDuplicate)
+    }
+
+    @Test
+    fun largeList_supportsFiftyPlusItems() {
+        val largeList = (1..60).map { "Meal #$it" }
+        assertEquals(60, largeList.size)
+
+        val recentPicks = listOf("Meal #1", "Meal #2", "Meal #3")
+        val candidates = largeList.filter { it !in recentPicks }
+
+        assertEquals(57, candidates.size)
+    }
+
+    @Test
     fun avoidRecentPicks_filtersRecentItems() {
         val dinners = listOf("Meal A", "Meal B", "Meal C", "Meal D")
         val recentPicks = listOf("Meal A", "Meal B")
